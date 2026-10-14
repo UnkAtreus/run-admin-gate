@@ -10,9 +10,8 @@ standard user can then start exactly those programs with administrator or
 SYSTEM rights. The user never learns an admin password and never becomes a
 permanent local administrator.
 
-> **Status: early development.** SYSTEM mode works and was tested on
-> Windows Server 2019 (build 17763). The administrator mode
-> (`/asadmin`) isn't implemented yet. Don't deploy it in production.
+> **Status: early development.** Tested on Windows Server 2019 (build 17763)
+> with local accounts. Don't deploy it in production yet.
 
 ![RunAdminGate manager](screenshots/manager.png)
 
@@ -42,7 +41,7 @@ permanent local administrator.
 | Part | What it does | Status |
 |---|---|---|
 | `runadmingate-manager.exe` | Manager: allow-list, Open with, shortcuts, service install | done, tested |
-| `runadmingate.exe` | Service and launcher. Checks the allow-list and starts the program as SYSTEM (admin mode planned) | SYSTEM mode and Open with tested |
+| `runadmingate.exe` | Service and launcher. Checks the allow-list and starts the program as SYSTEM, or as the user with administrator rights | SYSTEM and administrator mode tested |
 | `runadmingate-svc` | Runs a program as a service at boot | planned |
 | `runadmingate-elevate` | Requests UAC elevation for programs that don't ask for it | planned |
 
@@ -50,7 +49,7 @@ The allow-list lives in `HKLM\SOFTWARE\RunAdminGate`. Only administrators can
 write there, so users can't add entries themselves.
 
 - **`AllowedPath`**: `;`-separated entries. An entry is a program (`C:\Tools\app.exe`), a folder ending in `\`, a wildcard (`\\server\updates\setup*.exe`), or a `%windir%`-style path. Each entry can carry `/assystem` or `/asadmin`.
-- **`LogonFlag`**: the default mode, `asservice` (SYSTEM) or `asadmin` (the user's own account, temporarily in local Administrators).
+- **`LogonFlag`**: the default mode, `asservice` (SYSTEM) or `asadmin` (the user's own account, elevated: Administrators is added to a new logon token for that start, and the local Administrators group is never changed).
 
 ## Build
 

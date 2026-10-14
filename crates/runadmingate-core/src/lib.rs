@@ -46,7 +46,8 @@ const LAUNCHABLE_EXTENSIONS: [&str; 8] = [
 pub enum LogonMode {
     /// Under the local SYSTEM account (`asservice` / `/assystem`).
     System,
-    /// As the calling user, temporarily added to local Administrators (`asadmin` / `/asadmin`).
+    /// As the calling user, elevated (`asadmin` / `/asadmin`). Administrators is
+    /// added to a new logon token for that one start; the group itself is never changed.
     Admin,
 }
 

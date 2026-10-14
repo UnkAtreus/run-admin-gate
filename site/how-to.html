@@ -29,7 +29,7 @@
 <main>
   <section class="page-head">
     <div class="wrap">
-      <p class="label"><span class="shield" aria-hidden="true"></span>Setup guide · version 0.1.0</p>
+      <p class="label"><span class="shield" aria-hidden="true"></span>Setup guide · version 0.2.0</p>
       <h1>Set up RunAdminGate step by step</h1>
       <p class="lead">From the download to a standard user starting an approved app, then out to every PC with one command or a Group Policy item. You need a local administrator account for the setup and a standard account to test with.</p>
     </div>
@@ -42,7 +42,7 @@
         <li><a href="#download"><span class="n">1</span><span>Download and unblock</span></a></li>
         <li><a href="#install"><span class="n">2</span><span>Install the service</span></a></li>
         <li><a href="#allow"><span class="n">3</span><span>Allow a program</span></a></li>
-        <li><a href="#arguments"><span class="n">4</span><span>Choose the allowed arguments</span></a></li>
+        <li><a href="#arguments"><span class="n">4</span><span>Choose the account and arguments</span></a></li>
         <li><a href="#access"><span class="n">5</span><span>Give users a shortcut or Open with</span></a></li>
         <li><a href="#test"><span class="n">6</span><span>Test as a standard user</span></a></li>
         <li><a href="#audit"><span class="n">7</span><span>Check the Event Log</span></a></li>
@@ -161,8 +161,13 @@
       </section>
 
       <section class="step" id="arguments">
-        <div class="step-head"><span class="num" aria-hidden="true">4</span><h2>Choose the allowed arguments</h2></div>
-        <p>Select the program in the list. Under <span class="ui">Allowed arguments</span>, pick one:</p>
+        <div class="step-head"><span class="num" aria-hidden="true">4</span><h2>Choose the account and the arguments</h2></div>
+        <p>Select the program in the list. Under <span class="ui">Run as</span>, pick the account it starts with:</p>
+        <ul>
+          <li><span class="ui">SYSTEM account</span>: works for any user. The program doesn't see the user's own settings, HKEY_CURRENT_USER or mapped drives.</li>
+          <li><span class="ui">The user, with administrator rights</span>: the program runs under the user's own account, elevated, so it sees their settings and files. The user never joins the local Administrators group. Stored as <code>/asadmin</code> at the end of the entry.</li>
+        </ul>
+        <p>Under <span class="ui">Allowed arguments</span>, pick one:</p>
         <ul>
           <li><span class="ui">No arguments</span>: the program starts exactly as listed. Anything extra is refused.</li>
           <li><span class="ui">Let users open a file with it</span>: no arguments, or one full file path. The manager stores this as <code>%1</code>, and Open with needs it.</li>
@@ -273,7 +278,7 @@
             <tbody>
               <tr><td>“This program is not on the RunAdminGate allow-list.”</td><td>No entry matches the path and arguments. Folder entries don't include subfolders. Paste the entry into the rule tester above.</td></tr>
               <tr><td>Event ID 20, “Ignored AllowedPath entries”</td><td>An entry is relative, has a wildcard in the drive or share name, or uses an unknown <code>%VARIABLE%</code>. Fix or remove it.</td></tr>
-              <tr><td>“The administrator logon mode is not available yet.”</td><td>The entry or <code>LogonFlag</code> uses <code>/asadmin</code>. Remove the switch to run as SYSTEM.</td></tr>
+              <tr><td>Event ID 3 for an entry that runs as the user</td><td>Administrator mode logs the user on again through Windows (S4U). It was tested with local accounts. Domain accounts need a reachable domain controller and haven't been tested yet; run the app as SYSTEM meanwhile.</td></tr>
               <tr><td>“Requests are only accepted from an interactive desktop session.”</td><td>The launcher ran from a service or a scheduled task without a desktop. Start it from the user's session.</td></tr>
               <tr><td>The app can't see a mapped drive</td><td>The app runs as SYSTEM, which has none of the user's drive mappings. Use a <code>\\server\share</code> path.</td></tr>
               <tr><td>“App (admin)” isn't in the Open with menu</td><td>Windows shows new handlers under <span class="ui">Choose another app</span> first. Pick it there once.</td></tr>

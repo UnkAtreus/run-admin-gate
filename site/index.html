@@ -47,7 +47,7 @@
           <li>Free, source on GitHub</li>
           <li>Windows 10, 11 and Server, 64-bit</li>
           <li>No .NET or other runtime</li>
-          <li>Version 0.1.0 preview</li>
+          <li>Version 0.2.0 preview</li>
         </ul>
       </div>
 
@@ -191,7 +191,7 @@
         <li>
           <span class="num" aria-hidden="true">4</span>
           <h3>The program starts elevated</h3>
-          <p>It runs as SYSTEM on the user's own desktop. The Event Log records who started what, with the process ID.</p>
+          <p>It runs as SYSTEM, or as the user with admin rights, on the user's own desktop. The Event Log records who started what, with the process ID.</p>
           <code>Event ID 1 · 2 · 3</code>
         </li>
       </ol>
@@ -288,7 +288,7 @@
           <ul class="checks">
             <li class="careful"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4m0 2.6v.1"/></svg><div><strong>Elevated apps can start other apps</strong><span>A program with a File › Open dialog, a built-in console or a script host gives the user everything SYSTEM can do. That includes Notepad, which these screenshots use as a demo. Allow tools, not shells.</span></div></li>
             <li class="careful"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4m0 2.6v.1"/></svg><div><strong>Don't allow folders users can write to</strong><span>If a user can copy a file into an allowed folder, they can run anything. Keep allowed folders under Program Files or on a read-only share.</span></div></li>
-            <li class="careful"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4m0 2.6v.1"/></svg><div><strong>Programs run as SYSTEM, not as the user</strong><span>They don't see the user's mapped drives or HKEY_CURRENT_USER. Use UNC paths, and test each app before you roll it out.</span></div></li>
+            <li class="careful"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4m0 2.6v.1"/></svg><div><strong>Pick the right account per app</strong><span>As SYSTEM, a program doesn't see the user's mapped drives or HKEY_CURRENT_USER. Apps that need the user's own settings should run as the user with administrator rights. Test each app before you roll it out.</span></div></li>
           </ul>
         </div>
       </div>
@@ -336,11 +336,11 @@
         </details>
         <details>
           <summary>Which account do the programs run as?</summary>
-          <div class="answer"><p>As the local SYSTEM account, on the desktop of the user who asked. A second mode that runs the program as the user with temporary administrator rights (<code>/asadmin</code>) is planned and not available yet.</p></div>
+          <div class="answer"><p>You choose per app. <strong>SYSTEM account</strong> works for any user, but the program doesn't see the user's own settings or mapped drives. <strong>The user, with administrator rights</strong> runs the program under the user's own account, elevated. For that one start, RunAdminGate adds the Administrators group to a new logon token; the user is never added to the local Administrators group.</p></div>
         </details>
         <details>
           <summary>Which Windows versions are supported?</summary>
-          <div class="answer"><p>Windows 10, Windows 11 and Windows Server 2019 or later, all 64-bit. Version 0.1.0 was tested on Windows Server 2019 (build 17763, the same build as Windows 10 version 1809). Windows 10 and 11 desktops haven't been tested yet.</p></div>
+          <div class="answer"><p>Windows 10, Windows 11 and Windows Server 2019 or later, all 64-bit. Version 0.2.0 was tested on Windows Server 2019 (build 17763, the same build as Windows 10 version 1809). Windows 10 and 11 desktops haven't been tested yet.</p></div>
         </details>
         <details>
           <summary>Can I manage it with Group Policy?</summary>
@@ -364,8 +364,8 @@
       <h2>Read this before you deploy</h2>
       <div class="disc-cols">
         <p><strong>Provided as is.</strong> RunAdminGate is provided “as is”, without warranty of any kind, express or implied, including warranties of merchantability, fitness for a particular purpose and non-infringement.</p>
-        <p><strong>Preview software.</strong> Version 0.1.0 is an early preview. It may contain bugs, and its behavior may change between versions. Test it on machines that don't matter before you use it anywhere else.</p>
-        <p><strong>You choose what runs elevated.</strong> Programs started through RunAdminGate run with full SYSTEM rights. You are responsible for the programs and rules you allow. The authors are not liable for any damage, data loss, security incident or downtime that results from using it.</p>
+        <p><strong>Preview software.</strong> Version 0.2.0 is an early preview. It may contain bugs, and its behavior may change between versions. Test it on machines that don't matter before you use it anywhere else.</p>
+        <p><strong>You choose what runs elevated.</strong> Programs started through RunAdminGate run with full SYSTEM or administrator rights. You are responsible for the programs and rules you allow. The authors are not liable for any damage, data loss, security incident or downtime that results from using it.</p>
         <p><strong>Your policies and licenses.</strong> Check that using it fits your organization's security policy and compliance rules, and the license terms of the programs you allow.</p>
         <p><strong>Trademarks.</strong> RunAdminGate is an independent project. It is not affiliated with, endorsed by or sponsored by Microsoft. Windows and Windows Server are trademarks of the Microsoft group of companies. Contoso and Fabrikam are fictional example names.</p>
       </div>

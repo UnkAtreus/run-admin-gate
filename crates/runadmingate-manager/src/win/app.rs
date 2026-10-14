@@ -28,6 +28,7 @@ pub enum Message {
     RuleText(String),
     SaveRule,
     CloseDialog,
+    SetMode(LogonMode),
     SetArgs(Args),
     CustomArgs(String),
     SaveCustomArgs,
@@ -401,6 +402,19 @@ impl App {
                 }
             }
             Message::CloseDialog => self.dialog = None,
+            Message::SetMode(mode) => {
+                if let Some(item) = self.selected_item().cloned() {
+                    // Write a switch only when it differs from the default (LogonFlag).
+                    let default = self.default_mode.unwrap_or(LogonMode::System);
+                    let switch = (mode != default).then_some(mode);
+                    if self.replace_selected(runadmingate_core::with_override(&item.raw, switch)) {
+                        self.ok(match mode {
+                            LogonMode::System => "Runs as SYSTEM.",
+                            LogonMode::Admin => "Runs as the user, with administrator rights.",
+                        });
+                    }
+                }
+            }
             Message::SetArgs(args) => {
                 if let Some(item) = self.selected_item().cloned() {
                     let text = match args {
@@ -576,6 +590,14 @@ impl App {
             Event::Window(window::Event::Focused) => Some(Message::Refresh),
             _ => None,
         })
+    }
+
+    /// How the selected entry starts: its own switch, else `LogonFlag`.
+    pub fn mode_choice(&self, item: &Item) -> LogonMode {
+        item.parsed
+            .mode
+            .or(self.default_mode)
+            .unwrap_or(LogonMode::System)
     }
 
     /// The arguments choice shown in the details panel.

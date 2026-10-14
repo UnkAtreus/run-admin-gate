@@ -226,8 +226,8 @@ if (tocLinks.length && "IntersectionObserver" in window) {
       const want = rule.args.kind === "none" ? "This entry allows no arguments." : rule.args.kind === "file" ? "This entry allows nothing or one full file path." : "The arguments must match the entry's arguments as a whole.";
       return show("deny", "Refused (Event ID 2)", "The program matches, but the arguments don't. " + want);
     }
-    if (rule.mode === "admin") return show("deny", "Refused (Event ID 2)", "The entry matches, but it uses /asadmin: the administrator logon mode is not available yet.");
-    show("allow", "Allowed (Event ID 1)", "Starts as SYSTEM: \"" + pathString(n) + "\"" + (passed ? " " + passed : "") + ".");
+    const who = rule.mode === "admin" ? "Starts as the user with administrator rights: " : "Starts as SYSTEM: ";
+    show("allow", "Allowed (Event ID 1)", who + "\"" + pathString(n) + "\"" + (passed ? " " + passed : "") + ".");
   }
 
   const chips = [...document.querySelectorAll(".presets .chip")];

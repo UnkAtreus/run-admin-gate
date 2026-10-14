@@ -8,6 +8,8 @@ use iced::widget::{
 use iced::{Alignment, Color, Element, Font, Length, Padding};
 
 use super::app::{App, Dialog, Message, Toast, PLACES};
+use runadmingate_core::LogonMode;
+
 use super::model::{Args, Item, Kind};
 use super::platform::Service;
 use super::style::{self, glyph, *};
@@ -259,6 +261,35 @@ fn list_panel(app: &App) -> El<'_> {
         .into()
 }
 
+fn mode_section<'a>(app: &'a App, item: &'a Item) -> El<'a> {
+    let choice = Some(app.mode_choice(item));
+    let option = |caption: &'a str, hint: &'a str, value: LogonMode| {
+        column![
+            radio(caption, value, choice, Message::SetMode)
+                .size(16)
+                .text_size(13),
+            text(hint).size(11).color(TEXT3).wrapping(Wrapping::Word),
+        ]
+        .spacing(2)
+    };
+    section(
+        "Run as",
+        column![
+            option(
+                "SYSTEM account",
+                "Works for any user. The app doesn't see the user's own settings or mapped drives.",
+                LogonMode::System,
+            ),
+            option(
+                "The user, with administrator rights",
+                "Runs under the user's own account, so it sees their settings and files.",
+                LogonMode::Admin,
+            ),
+        ]
+        .spacing(10),
+    )
+}
+
 fn args_section<'a>(app: &'a App, item: &'a Item) -> El<'a> {
     let choice = Some(app.args_choice(item));
     let option = |caption: &'a str, value: Args| {
@@ -420,10 +451,15 @@ fn details(app: &App) -> El<'_> {
     }
     content = content.push(banner(
         glyph::SHIELD,
-        "Runs as SYSTEM: full control of this computer. Only allow apps you'd trust every user with.".to_string(),
+        match app.mode_choice(item) {
+            LogonMode::System => "Runs as SYSTEM: full control of this computer. Only allow apps you'd trust every user with.",
+            LogonMode::Admin => "Runs as the user, elevated: full control of this computer. Only allow apps you'd trust every user with.",
+        }
+        .to_string(),
         TEXT2,
         CHIP,
     ));
+    content = content.push(mode_section(app, item));
     match item.kind {
         Kind::Program => {
             content = content.push(args_section(app, item));

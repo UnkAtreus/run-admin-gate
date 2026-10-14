@@ -6,10 +6,10 @@ use runadmingate_core::policy::{Decision, DenyReason, Policy};
 use runadmingate_core::protocol::{LaunchRequest, Refusal, Response};
 use runadmingate_core::LogonMode;
 use windows::core::HSTRING;
-use windows::Win32::Foundation::{GetLastError, HANDLE};
+use windows::Win32::Foundation::{GetLastError, ERROR_NO_SUCH_LOGON_SESSION, HANDLE};
 use windows::Win32::Security::{
-    GetTokenInformation, LookupAccountSidW, RevertToSelf, TokenSessionId, TokenUser, SID_NAME_USE,
-    TOKEN_QUERY, TOKEN_USER,
+    GetLengthSid, GetTokenInformation, LookupAccountSidW, RevertToSelf, TokenGroups,
+    TokenSessionId, TokenUser, SID_NAME_USE, TOKEN_GROUPS, TOKEN_QUERY, TOKEN_USER,
 };
 use windows::Win32::Storage::FileSystem::{
     CreateFileW, GetFileInformationByHandle, GetFinalPathNameByHandleW, BY_HANDLE_FILE_INFORMATION,
@@ -30,7 +30,32 @@ use super::util::{error_text, from_wide, Handle};
 /// Who sent the request, read from the pipe client's token.
 struct Caller {
     session_id: u32,
+    /// `DOMAIN\name`, for the event log.
     account: String,
+    /// Set when the account name resolved and the session has a logon SID.
+    user: Option<launch::User>,
+}
+
+/// The logon SID among the token's groups, as raw SID bytes.
+unsafe fn logon_sid(token: HANDLE) -> Option<Vec<u8>> {
+    let mut len = 0u32;
+    let _ = GetTokenInformation(token, TokenGroups, None, 0, &mut len);
+    let mut buf = vec![0u64; (len as usize).div_ceil(8)];
+    GetTokenInformation(
+        token,
+        TokenGroups,
+        Some(buf.as_mut_ptr().cast()),
+        len,
+        &mut len,
+    )
+    .ok()?;
+    let groups = &*(buf.as_ptr() as *const TOKEN_GROUPS);
+    let entries = std::slice::from_raw_parts(groups.Groups.as_ptr(), groups.GroupCount as usize);
+    let entry = entries
+        .iter()
+        .find(|g| g.Attributes & launch::SE_GROUP_LOGON_ID == launch::SE_GROUP_LOGON_ID)?;
+    let size = GetLengthSid(entry.Sid) as usize;
+    Some(std::slice::from_raw_parts(entry.Sid.0 as *const u8, size).to_vec())
 }
 
 fn caller(pipe: HANDLE) -> Option<Caller> {
@@ -56,8 +81,10 @@ fn caller(pipe: HANDLE) -> Option<Caller> {
         )
         .ok()?;
 
+        let session_logon_sid = logon_sid(token.raw());
         let mut buf = vec![0u8; 256];
         let mut account = String::from("unknown user");
+        let mut admin_user = None;
         if GetTokenInformation(
             token.raw(),
             TokenUser,
@@ -83,12 +110,19 @@ fn caller(pipe: HANDLE) -> Option<Caller> {
             )
             .is_ok()
             {
-                account = format!("{}\\{}", from_wide(&domain), from_wide(&name));
+                let (name, domain) = (from_wide(&name), from_wide(&domain));
+                account = format!("{domain}\\{name}");
+                admin_user = session_logon_sid.map(|logon_sid| launch::User {
+                    name,
+                    domain,
+                    logon_sid,
+                });
             }
         }
         Some(Caller {
             session_id,
             account,
+            user: admin_user,
         })
     }
 }
@@ -225,10 +259,6 @@ pub fn handle(pipe: HANDLE, request: &LaunchRequest) -> Response {
             return refuse(account, &canonical, Refusal::NotListed, &note);
         }
     };
-    if mode == LogonMode::Admin {
-        return refuse(account, &canonical, Refusal::AdminModeUnavailable, "");
-    }
-
     let spec = match command::build(&system_dir(), &canonical, &args) {
         Ok(spec) => spec,
         Err(BuildError::UnsupportedType | BuildError::BadPath) => {
@@ -239,13 +269,23 @@ pub fn handle(pipe: HANDLE, request: &LaunchRequest) -> Response {
         }
     };
 
-    match launch::start_as_system(who.session_id, &spec) {
+    let (started, how) = match mode {
+        LogonMode::System => (launch::start_as_system(who.session_id, &spec), "as SYSTEM"),
+        LogonMode::Admin => match &who.user {
+            Some(user) => (
+                launch::start_as_admin(who.session_id, user, &spec),
+                "as the user with administrator rights",
+            ),
+            None => return fail(account, &canonical, ERROR_NO_SUCH_LOGON_SESSION.0),
+        },
+    };
+    match started {
         Ok(started) => {
             eventlog::report(
                 Level::Info,
                 id::STARTED,
                 &format!(
-                    "Started as SYSTEM for {account} (session {}): {}\nProcess ID {}",
+                    "Started {how} for {account} (session {}): {}\nProcess ID {}",
                     who.session_id, spec.command_line, started.pid
                 ),
             );

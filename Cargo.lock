@@ -1748,7 +1748,7 @@ checksum = "6c20b6793b5c2fa6553b250154b78d6d0db37e72700ae35fad9387a46f487c97"
 
 [[package]]
 name = "runadmingate"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "embed-resource",
  "runadmingate-core",
@@ -1759,11 +1759,11 @@ dependencies = [
 
 [[package]]
 name = "runadmingate-core"
-version = "0.1.0"
+version = "0.2.0"
 
 [[package]]
 name = "runadmingate-manager"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "embed-resource",
  "iced",
@@ -1776,7 +1776,7 @@ dependencies = [
 
 [[package]]
 name = "runadmingate-win"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "runadmingate-core",
  "windows",

@@ -55,6 +55,7 @@ impl Refusal {
             Refusal::UnsafeArguments => {
                 "The arguments contain characters that are not allowed for this file type."
             }
+            // Sent by 0.1 services, which could not start /asadmin entries yet.
             Refusal::AdminModeUnavailable => "The administrator logon mode is not available yet.",
             Refusal::NotInteractive => {
                 "Requests are only accepted from an interactive desktop session."
