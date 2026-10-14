@@ -206,6 +206,11 @@ fn fail(caller: &str, program: &str, code: u32) -> Response {
 
 pub fn handle(pipe: HANDLE, request: &LaunchRequest) -> Response {
     let Some(who) = caller(pipe) else {
+        eventlog::report(
+            Level::Warning,
+            id::REFUSED,
+            "Refused a request: the caller could not be identified.",
+        );
         return Response::Refused {
             reason: Refusal::BadRequest,
             detail: String::new(),

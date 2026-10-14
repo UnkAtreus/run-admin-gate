@@ -5,12 +5,18 @@ use runadmingate_core::protocol::{LaunchRequest, Response, MAX_MESSAGE, PIPE_NAM
 use runadmingate_core::SERVICE_NAME;
 use windows::core::{HSTRING, PCWSTR};
 use windows::Win32::Foundation::{
-    ERROR_ACCESS_DENIED, ERROR_FILE_NOT_FOUND, ERROR_PIPE_BUSY, ERROR_SERVICE_NOT_ACTIVE, HANDLE,
+    LocalFree, ERROR_ACCESS_DENIED, ERROR_FILE_NOT_FOUND, ERROR_PIPE_BUSY,
+    ERROR_SERVICE_NOT_ACTIVE, ERROR_SUCCESS, HANDLE, HLOCAL,
+};
+use windows::Win32::Security::Authorization::{GetSecurityInfo, SE_KERNEL_OBJECT};
+use windows::Win32::Security::{
+    IsWellKnownSid, WinBuiltinAdministratorsSid, WinLocalSystemSid, OWNER_SECURITY_INFORMATION,
+    PSECURITY_DESCRIPTOR, PSID,
 };
 use windows::Win32::Storage::FileSystem::{
     CreateFileW, ReadFile, SearchPathW, WriteFile, FILE_FLAGS_AND_ATTRIBUTES, FILE_READ_ATTRIBUTES,
     FILE_READ_DATA, FILE_SHARE_NONE, FILE_WRITE_ATTRIBUTES, FILE_WRITE_DATA, OPEN_EXISTING,
-    SECURITY_IDENTIFICATION, SECURITY_SQOS_PRESENT, SYNCHRONIZE,
+    READ_CONTROL, SECURITY_IDENTIFICATION, SECURITY_SQOS_PRESENT, SYNCHRONIZE,
 };
 use windows::Win32::System::Pipes::{
     GetNamedPipeServerProcessId, SetNamedPipeHandleState, WaitNamedPipeW, PIPE_READMODE_MESSAGE,
@@ -47,6 +53,34 @@ fn resolve(program: &str) -> String {
         .unwrap_or_else(|_| program.to_string())
 }
 
+/// The service creates the pipe as SYSTEM, so it is owned by SYSTEM or
+/// Administrators. A standard user squatting on the name would own it
+/// themselves. Unlike asking the SCM, this works when policy restricts the SCM.
+fn owned_by_system(pipe: HANDLE) -> bool {
+    unsafe {
+        let mut owner = PSID::default();
+        let mut sd = PSECURITY_DESCRIPTOR::default();
+        let err = GetSecurityInfo(
+            pipe,
+            SE_KERNEL_OBJECT,
+            OWNER_SECURITY_INFORMATION,
+            Some(&mut owner),
+            None,
+            None,
+            None,
+            Some(&mut sd),
+        );
+        if err != ERROR_SUCCESS {
+            return false;
+        }
+        let ok = IsWellKnownSid(owner, WinLocalSystemSid).as_bool()
+            || IsWellKnownSid(owner, WinBuiltinAdministratorsSid).as_bool();
+        let _ = LocalFree(HLOCAL(sd.0));
+        ok
+    }
+}
+
+/// The service's process ID, when the SCM lets us ask.
 fn service_pid() -> Option<u32> {
     let manager =
         ServiceManager::local_computer(None::<&str>, ServiceManagerAccess::CONNECT).ok()?;
@@ -70,6 +104,7 @@ fn connect() -> Result<Handle, u32> {
                     | FILE_WRITE_DATA
                     | FILE_READ_ATTRIBUTES
                     | FILE_WRITE_ATTRIBUTES
+                    | READ_CONTROL
                     | SYNCHRONIZE)
                     .0,
                 FILE_SHARE_NONE,
@@ -134,10 +169,13 @@ pub fn run(program: &str, args: &str, quiet: bool) -> i32 {
         }
     };
 
-    // Only talk to the real service, not to someone squatting on the pipe name.
+    // Only talk to the real service, not to someone squatting on the pipe name:
+    // the pipe must be owned by SYSTEM, and when the SCM answers, the server
+    // process must be the service.
     let mut server_pid = 0u32;
-    let genuine = unsafe { GetNamedPipeServerProcessId(pipe.raw(), &mut server_pid) }.is_ok()
-        && service_pid() == Some(server_pid);
+    let genuine = owned_by_system(pipe.raw())
+        && unsafe { GetNamedPipeServerProcessId(pipe.raw(), &mut server_pid) }.is_ok()
+        && service_pid().map_or(true, |pid| pid == server_pid);
     if !genuine {
         show(
             "The RunAdminGate pipe is not served by the RunAdminGate service.",
