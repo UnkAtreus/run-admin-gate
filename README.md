@@ -3,13 +3,15 @@
 **Run programs as administrator without giving users admin rights.**
 RunAdminGate is an open-source, allow-list-based privilege elevation tool for Windows, written in Rust.
 
+Website and setup guide: https://unkatreus.github.io/run-admin-gate/ · Download: [latest release](https://github.com/UnkAtreus/run-admin-gate/releases/latest)
+
 An administrator picks which programs, folders or installers are allowed. A
 standard user can then start exactly those programs with administrator or
 SYSTEM rights. The user never learns an admin password and never becomes a
 permanent local administrator.
 
 > **Status: early development.** SYSTEM mode works and was tested on
-> Windows 10 1809. The administrator mode
+> Windows Server 2019 (build 17763). The administrator mode
 > (`/asadmin`) isn't implemented yet. Don't deploy it in production.
 
 ![RunAdminGate manager](screenshots/manager.png)

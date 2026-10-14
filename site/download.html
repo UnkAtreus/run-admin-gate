@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Download RunAdminGate</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Download RunAdminGate 0.1.0 for Windows 10, 11 and Windows Server (64-bit), check the file hash, or build it from source with Rust.">
+<link rel="icon" type="image/png" href="img/logo-64.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Schibsted+Grotesk:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="img/logo-64.png" alt="" width="32" height="32"><span>RunAdminGate</span></a>
+    <nav class="nav" aria-label="Main">
+      <a class="nav-sec" href="index.html#how">How it works</a>
+      <a class="nav-sec" href="index.html#security">Security</a>
+      <a href="how-to.html">Setup guide</a>
+      <a class="btn btn-primary btn-sm" href="download.html" aria-current="page">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-head">
+    <div class="wrap">
+      <p class="label"><span class="shield" aria-hidden="true"></span>Download</p>
+      <h1>Download RunAdminGate</h1>
+      <p class="lead">One zip with two programs. Nothing else to install: no .NET, no Visual C++ runtime, no database.</p>
+    </div>
+  </section>
+
+  <div class="wrap dl-grid">
+    <div class="win release">
+      <div class="win-bar"><span class="win-title">Latest release</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+      <div class="body">
+        <div class="release-top">
+          <img src="img/logo.png" alt="" width="64" height="64">
+          <div>
+            <h2>RunAdminGate 0.1.0</h2>
+            <p>Windows 10, 11 and Server · 64-bit (x64)</p>
+          </div>
+          <span class="pill">Preview</span>
+        </div>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://github.com/UnkAtreus/run-admin-gate/releases/latest/download/RunAdminGate-x64.zip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/></svg>
+            Download RunAdminGate-x64.zip
+          </a>
+          <a class="btn btn-quiet" href="https://github.com/UnkAtreus/run-admin-gate/releases/latest">Release notes and checksums</a>
+        </div>
+        <table class="files">
+          <thead><tr><th scope="col">In the zip</th><th scope="col">What it is</th><th scope="col">Size</th></tr></thead>
+          <tbody>
+            <tr><td>runadmingate.exe</td><td>Service, installer and the launcher users start apps with</td><td>0.5 MB</td></tr>
+            <tr><td>runadmingate-manager.exe</td><td>The window you manage the allow-list in</td><td>2.9 MB</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="panel">
+        <h3>Requirements</h3>
+        <ul class="reqs">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.6 2.5L16 9.5"/></svg><span>Windows 10, 11, or Windows Server 2019 and later, 64-bit. Tested on Windows Server 2019.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.6 2.5L16 9.5"/></svg><span>A local administrator account to install the service.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.6 2.5L16 9.5"/></svg><span>About 4 MB of disk space.</span></li>
+          <li class="no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg><span>Windows 10 and 11 desktops: not tested yet.</span></li>
+          <li class="no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg><span>32-bit: build from source with <code>cargo win32</code> (not tested yet).</span></li>
+        </ul>
+      </div>
+      <div class="panel caution">
+        <h3>Before you install</h3>
+        <ul class="checks">
+          <li class="careful"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4m0 2.6v.1"/></svg><div><strong>Early preview</strong><span>Use a test PC. Don't deploy it in production yet.</span></div></li>
+          <li class="careful"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4m0 2.6v.1"/></svg><div><strong>Not code-signed yet</strong><span>SmartScreen will warn you. Check the hash below before you run it.</span></div></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <div class="wrap dl-more">
+    <section id="verify">
+      <h2>Check the download</h2>
+      <p>Compare the SHA-256 hash with the one in <code>SHA256SUMS.txt</code> on the release page. If they differ, delete the file.</p>
+      <div class="win term">
+        <div class="win-bar"><span class="win-title">Windows PowerShell</span><button class="copy" type="button">Copy</button><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+<pre><code><span class="p">PS C:\Setup&gt; </span>Get-FileHash .\RunAdminGate-x64.zip -Algorithm SHA256</code></pre>
+      </div>
+    </section>
+
+    <section id="source">
+      <h2>Build from source</h2>
+      <p>You need Rust 1.80 or newer. Releases are cross-compiled from macOS or Linux with mingw-w64. Building on Windows with <code>cargo build --release</code> should also work but hasn't been tested.</p>
+      <div class="win term">
+        <div class="win-bar"><span class="win-title">Terminal</span><button class="copy" type="button">Copy</button><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+<pre><code><span class="p">$ </span>git clone https://github.com/UnkAtreus/run-admin-gate.git
+<span class="p">$ </span>cd run-admin-gate
+<span class="p">$ </span>cargo test                               <span class="c"># allow-list tests, any OS</span>
+<span class="p">$ </span>rustup target add x86_64-pc-windows-gnu  <span class="c"># once; needs mingw-w64</span>
+<span class="p">$ </span>cargo win                                <span class="c"># 64-bit build</span>
+<span class="p">$ </span>cargo win32                              <span class="c"># 32-bit build</span></code></pre>
+      </div>
+      <p>The programs land in <code>target/x86_64-pc-windows-gnu/release/</code> (or <code>i686-pc-windows-gnu</code> for 32-bit).</p>
+    </section>
+
+    <section id="changes">
+      <h2>What's in 0.1.0</h2>
+      <div class="notes-cols">
+        <div class="panel">
+          <h3>Included</h3>
+          <ul>
+            <li>Service and launcher that start allowed programs as SYSTEM in the user's session</li>
+            <li>Allow-list by program, folder, subfolders or pattern, with argument rules</li>
+            <li>Manager window with rule checking</li>
+            <li>Desktop and Start menu shortcuts with the app's icon</li>
+            <li>Open with entries per app and file type</li>
+            <li>Event Log entries for every start, refusal and failure</li>
+            <li>Silent install and uninstall with exit codes</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Planned</h3>
+          <ul>
+            <li>Run as the user with temporary admin rights (<code>/asadmin</code>)</li>
+            <li>Warning for allowed folders that users can write to</li>
+            <li>ADMX template for Group Policy</li>
+            <li>Code-signed releases</li>
+            <li>Testing on Windows 10 and 11 desktops</li>
+          </ul>
+        </div>
+      </div>
+      <p>License: not chosen yet. The source code is public on GitHub.</p>
+    </section>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <a class="brand" href="index.html"><img src="img/logo-64.png" alt="" width="26" height="26"><span>RunAdminGate</span></a>
+    <nav aria-label="Footer">
+      <a href="index.html">Overview</a>
+      <a href="how-to.html">Setup guide</a>
+      <a href="https://github.com/UnkAtreus/run-admin-gate">Source code on GitHub</a>
+    </nav>
+    <p class="fine">RunAdminGate is an independent project and is not affiliated with Microsoft. Windows is a trademark of Microsoft Corporation.</p>
+  </div>
+</footer>
+
+<script src="site.js" defer></script>
+</body>
+</html>

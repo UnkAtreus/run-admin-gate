@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RunAdminGate Setup Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Step by step: install RunAdminGate, allow a program, give standard users a shortcut or Open with entry, check the Event Log and roll it out with Group Policy.">
+<link rel="icon" type="image/png" href="img/logo-64.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Schibsted+Grotesk:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="img/logo-64.png" alt="" width="32" height="32"><span>RunAdminGate</span></a>
+    <nav class="nav" aria-label="Main">
+      <a class="nav-sec" href="index.html#how">How it works</a>
+      <a class="nav-sec" href="index.html#security">Security</a>
+      <a href="how-to.html" aria-current="page">Setup guide</a>
+      <a class="btn btn-primary btn-sm" href="download.html">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-head">
+    <div class="wrap">
+      <p class="label"><span class="shield" aria-hidden="true"></span>Setup guide · version 0.1.0</p>
+      <h1>Set up RunAdminGate step by step</h1>
+      <p class="lead">From the download to a standard user starting an approved app, then out to every PC with one command or a Group Policy item. You need a local administrator account for the setup and a standard account to test with.</p>
+    </div>
+  </section>
+
+  <div class="wrap doc-grid">
+    <nav class="toc" aria-label="Steps">
+      <p class="label">Steps</p>
+      <ol>
+        <li><a href="#download"><span class="n">1</span><span>Download and unblock</span></a></li>
+        <li><a href="#install"><span class="n">2</span><span>Install the service</span></a></li>
+        <li><a href="#allow"><span class="n">3</span><span>Allow a program</span></a></li>
+        <li><a href="#arguments"><span class="n">4</span><span>Choose the allowed arguments</span></a></li>
+        <li><a href="#access"><span class="n">5</span><span>Give users a shortcut or Open with</span></a></li>
+        <li><a href="#test"><span class="n">6</span><span>Test as a standard user</span></a></li>
+        <li><a href="#audit"><span class="n">7</span><span>Check the Event Log</span></a></li>
+        <li><a href="#rollout"><span class="n">8</span><span>Roll out to more PCs</span></a></li>
+        <li><a href="#uninstall"><span class="n">9</span><span>Uninstall</span></a></li>
+      </ol>
+      <ol class="extra">
+        <li><a href="#troubleshooting"><span class="n">?</span><span>Troubleshooting</span></a></li>
+      </ol>
+    </nav>
+
+    <article class="doc">
+      <section class="step" id="download">
+        <div class="step-head"><span class="num" aria-hidden="true">1</span><h2>Download and unblock</h2></div>
+        <p>Get the zip from the <a href="download.html">download page</a> and check its SHA-256 against the value on the release page. Files from the internet carry a “downloaded” mark, so unblock the zip before you extract it.</p>
+        <div class="win term">
+          <div class="win-bar"><span class="win-title">Administrator: Windows PowerShell</span><button class="copy" type="button">Copy</button><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+<pre><code><span class="p">PS C:\Setup&gt; </span>Get-FileHash .\RunAdminGate-x64.zip -Algorithm SHA256
+<span class="p">PS C:\Setup&gt; </span>Unblock-File .\RunAdminGate-x64.zip
+<span class="p">PS C:\Setup&gt; </span>Expand-Archive .\RunAdminGate-x64.zip -DestinationPath .\RunAdminGate</code></pre>
+        </div>
+        <p>Keep both files in the same folder: <code>runadmingate.exe</code> is the service and launcher, <code>runadmingate-manager.exe</code> is the window you configure it with.</p>
+        <div class="warn-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4m0 2.6v.1"/></svg>
+          <div><p>The preview isn't code-signed yet. If SmartScreen shows <span class="ui">Windows protected your PC</span>, choose <span class="ui">More info</span>, then <span class="ui">Run anyway</span>. Do this on a test PC only.</p></div>
+        </div>
+      </section>
+
+      <section class="step" id="install">
+        <div class="step-head"><span class="num" aria-hidden="true">2</span><h2>Install the service</h2></div>
+        <p>Open <code>runadmingate-manager.exe</code> and approve the UAC prompt; the manager needs admin rights because it writes to HKLM and installs a service. The header shows <span class="ui">Service not installed</span>. Click <span class="ui">Install service</span>.</p>
+        <p>The install:</p>
+        <ul>
+          <li>copies the launcher to <code>C:\Program Files\RunAdminGate\runadmingate.exe</code>,</li>
+          <li>creates the <strong>RunAdminGate</strong> service (automatic start, restarts after a failure),</li>
+          <li>creates the key <code>HKLM\SOFTWARE\RunAdminGate</code> and registers the Event Log source,</li>
+          <li>starts the service. The header changes to <span class="ui">Service running</span>.</li>
+        </ul>
+        <p>From a script, use the same switch. The launcher is a windowed program, so wait for it to read the exit code:</p>
+        <div class="win term">
+          <div class="win-bar"><span class="win-title">Administrator: Windows PowerShell</span><button class="copy" type="button">Copy</button><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+<pre><code><span class="p">PS C:\Setup\RunAdminGate&gt; </span>$p = Start-Process .\runadmingate.exe -ArgumentList '/install','/quiet' -Wait -PassThru
+<span class="p">PS C:\Setup\RunAdminGate&gt; </span>$p.ExitCode
+<span class="c">0</span></code></pre>
+        </div>
+        <div class="note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5m0-9v.2"/></svg>
+          <div><p>If <span class="ui">Install service</span> is greyed out, the manager can't find <code>runadmingate.exe</code> next to it. Put both files in the same folder.</p></div>
+        </div>
+      </section>
+
+      <section class="step" id="allow">
+        <div class="step-head"><span class="num" aria-hidden="true">3</span><h2>Allow a program</h2></div>
+        <p>Use one of the three buttons above the list:</p>
+        <ul>
+          <li><span class="ui">Add app</span> picks one program file. This is the safest choice.</li>
+          <li><span class="ui">Add folder</span> allows the programs in a folder. Tick <span class="ui">Include subfolders</span> to go deeper.</li>
+          <li><span class="ui">Add rule</span> takes a path or pattern you type, for example an installer share.</li>
+        </ul>
+        <figure>
+          <img src="img/add-rule.png" width="1622" height="1096" loading="lazy" alt="The Add a rule dialog with a syntax reference, rejecting *\updates\setup.exe because it is not an absolute path.">
+          <figcaption>The rule dialog checks each entry before it is saved.</figcaption>
+        </figure>
+        <div class="ref-wrap">
+          <table class="ref">
+            <thead><tr><th scope="col">Entry</th><th scope="col">Allows</th></tr></thead>
+            <tbody>
+              <tr><td><code>C:\Tools\app.exe</code></td><td>One program.</td></tr>
+              <tr><td><code>C:\Tools\</code></td><td>Programs directly in this folder. Subfolders are not included.</td></tr>
+              <tr><td><code>C:\Tools\**</code></td><td>Programs in this folder and every subfolder.</td></tr>
+              <tr><td><code>\\fs01\updates\setup*.msi</code></td><td><code>*</code> matches part of one name, <code>**</code> any number of folders, <code>?</code> one character. The pattern must match the whole path.</td></tr>
+              <tr><td><code>"C:\App\setup.exe" /S</code></td><td>This program, started with exactly these arguments. Quote the path when arguments follow.</td></tr>
+              <tr><td><code>"C:\App\viewer.exe" %1</code></td><td>This program with no arguments, or with one file to open.</td></tr>
+              <tr><td><code>%windir%\System32\cleanmgr.exe</code></td><td>Environment variables are expanded with the service's own (SYSTEM) values, never the user's.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The drive letter or <code>\\server\share</code> must be written out. Relative paths and entries such as <code>*\setup.exe</code> are rejected, so an entry can never mean “a file with this name anywhere”.</p>
+
+        <div class="win tester" id="tester">
+          <div class="win-bar"><span class="win-title">Rule tester · runs in your browser, same rules as the service</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+          <div class="body">
+            <div class="presets" role="group" aria-label="Examples">
+              <button class="chip" type="button" data-rule="C:\Tools\" data-program="C:\Tools\sub\report.exe" data-args="">Folder, file in a subfolder</button>
+              <button class="chip" type="button" data-rule="C:\Tools\**" data-program="C:\Tools\sub\report.exe" data-args="">Folder with subfolders</button>
+              <button class="chip" type="button" data-rule="C:\Tools\" data-program="C:\Tools\..\Users\mlee\Downloads\tool.exe" data-args="">Escape with ..\</button>
+              <button class="chip" type="button" data-rule="\\fs01\updates\setup*.msi /qn" data-program="\\fs01\updates\setup-24.2.msi" data-args="/qn">Installer share</button>
+              <button class="chip" type="button" data-rule="&quot;C:\Windows\System32\notepad.exe&quot; %1" data-program="C:\Windows\System32\notepad.exe" data-args="&quot;C:\ProgramData\Fabrikam\app.ini&quot;">Open one file</button>
+              <button class="chip" type="button" data-rule="*\updates\tool*.exe" data-program="C:\updates\tool1.exe" data-args="">Invalid entry</button>
+            </div>
+            <div class="field">
+              <label for="t-rule">AllowedPath entry</label>
+              <input id="t-rule" type="text" spellcheck="false" autocomplete="off" value="C:\Tools\">
+            </div>
+            <div class="fields-2">
+              <div class="field">
+                <label for="t-program">Program the user starts</label>
+                <input id="t-program" type="text" spellcheck="false" autocomplete="off" value="C:\Tools\sub\report.exe">
+              </div>
+              <div class="field">
+                <label for="t-args">Arguments</label>
+                <input id="t-args" type="text" spellcheck="false" autocomplete="off" value="" placeholder="none">
+              </div>
+            </div>
+            <div class="verdict deny" id="t-out" role="status" aria-live="polite">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6m0-6-6 6"/></svg>
+              <div><strong>Refused (Event ID 2)</strong><span>This program is not on the RunAdminGate allow-list. Folder entries don't include subfolders; end the entry with \** for that.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="warn-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4m0 2.6v.1"/></svg>
+          <div><p><strong>Only allow folders that standard users can't write to.</strong> Anyone who can copy a file into an allowed folder can run anything as SYSTEM.</p><p>Also avoid programs that can start other programs, such as consoles, script hosts, or apps with a File › Open dialog.</p></div>
+        </div>
+      </section>
+
+      <section class="step" id="arguments">
+        <div class="step-head"><span class="num" aria-hidden="true">4</span><h2>Choose the allowed arguments</h2></div>
+        <p>Select the program in the list. Under <span class="ui">Allowed arguments</span>, pick one:</p>
+        <ul>
+          <li><span class="ui">No arguments</span>: the program starts exactly as listed. Anything extra is refused.</li>
+          <li><span class="ui">Let users open a file with it</span>: no arguments, or one full file path. The manager stores this as <code>%1</code>, and Open with needs it.</li>
+          <li><span class="ui">Only these arguments</span>: the arguments must match what you type, ignoring case. Inside arguments, <code>*</code> matches anything and <code>?</code> one character, so <code>/S /D=*</code> allows any install folder.</li>
+        </ul>
+      </section>
+
+      <section class="step" id="access">
+        <div class="step-head"><span class="num" aria-hidden="true">5</span><h2>Give users a shortcut or Open with</h2></div>
+        <p><strong>Shortcut.</strong> Under <span class="ui">Shortcut</span>, choose <span class="ui">Desktop (all users)</span>, <span class="ui">Start menu (all users)</span> or <span class="ui">Choose a folder…</span>, then <span class="ui">Create shortcut</span>. It is called “App (admin)”, uses the app's icon and runs the app through the launcher.</p>
+        <p><strong>Open with.</strong> Turn on <span class="ui">Show in the “Open with” menu</span> and list the file types, for example <code>.txt, .log, .ini</code>. <span class="ui">Suggest</span> fills in the types the app already handles. Click <span class="ui">Save</span>.</p>
+        <figure>
+          <img src="img/open-with.png" width="589" height="688" loading="lazy" alt="The Windows 'How do you want to open this file?' dialog listing Notepad (admin), marked New.">
+          <figcaption>Windows lists a new handler under Choose another app first, marked “New”.</figcaption>
+        </figure>
+        <div class="note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5m0-9v.2"/></svg>
+          <div><p>The first time, users right-click the file and choose <span class="ui">Open with › Choose another app</span>, then “App (admin)”. Ticking <span class="ui">Always use this app</span> makes it the default for that file type.</p></div>
+        </div>
+        <p><strong>Scripts and your own shortcuts.</strong> Call the installed launcher with the program and its arguments:</p>
+        <div class="win term">
+          <div class="win-bar"><span class="win-title">Command Prompt</span><button class="copy" type="button">Copy</button><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+<pre><code><span class="p">C:\&gt; </span>"C:\Program Files\RunAdminGate\runadmingate.exe" "C:\Program Files\Fabrikam\Updater\update.exe"</code></pre>
+        </div>
+      </section>
+
+      <section class="step" id="test">
+        <div class="step-head"><span class="num" aria-hidden="true">6</span><h2>Test as a standard user</h2></div>
+        <ol>
+          <li>Sign in with an account that is not in the local Administrators group.</li>
+          <li>Double-click the “App (admin)” shortcut. The app opens with no UAC prompt.</li>
+          <li>In Task Manager, open <span class="ui">Details</span>. The <span class="ui">User name</span> column shows <strong>SYSTEM</strong> for the app.</li>
+          <li>Try a program that isn't on the list. RunAdminGate shows a message that it is not on the allow-list, and nothing starts.</li>
+        </ol>
+        <div class="win term">
+          <div class="win-bar"><span class="win-title">Windows PowerShell</span><button class="copy" type="button">Copy</button><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+<pre><code><span class="p">PS C:\Users\mlee&gt; </span>&amp; "C:\Program Files\RunAdminGate\runadmingate.exe" C:\Windows\System32\cmd.exe
+<span class="c"># A message box says: This program is not on the RunAdminGate allow-list.</span></code></pre>
+        </div>
+      </section>
+
+      <section class="step" id="audit">
+        <div class="step-head"><span class="num" aria-hidden="true">7</span><h2>Check the Event Log</h2></div>
+        <p>Open <span class="ui">Event Viewer › Windows Logs › Application</span>, choose <span class="ui">Filter Current Log…</span> and pick the event source <strong>RunAdminGate</strong>.</p>
+        <div class="ref-wrap">
+          <table class="ref">
+            <thead><tr><th scope="col">Event ID</th><th scope="col">Level</th><th scope="col">Meaning</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Information</td><td>A program started as SYSTEM: account, session, command line and process ID.</td></tr>
+              <tr><td>2</td><td>Warning</td><td>A request was refused: account, program and the reason.</td></tr>
+              <tr><td>3</td><td>Error</td><td>A listed program could not be started.</td></tr>
+              <tr><td>10 / 11</td><td>Information</td><td>The service started or stopped.</td></tr>
+              <tr><td>12</td><td>Error</td><td>The service hit an error.</td></tr>
+              <tr><td>20</td><td>Warning</td><td>Some <code>AllowedPath</code> entries are invalid and were ignored.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="win term">
+          <div class="win-bar"><span class="win-title">Administrator: Windows PowerShell</span><button class="copy" type="button">Copy</button><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+<pre><code><span class="p">PS C:\&gt; </span>Get-WinEvent -FilterHashtable @{ LogName = 'Application'; ProviderName = 'RunAdminGate' } -MaxEvents 20 |
+    Format-Table TimeCreated, Id, Message -Wrap</code></pre>
+        </div>
+      </section>
+
+      <section class="step" id="rollout">
+        <div class="step-head"><span class="num" aria-hidden="true">8</span><h2>Roll out to more PCs</h2></div>
+        <p><strong>Silent install.</strong> Run this from your deployment tool as SYSTEM or as an administrator. <code>/allowedpath:</code> takes entries separated by <code>;</code> and adds them to the existing list without removing anything. Running <code>/install</code> again upgrades in place.</p>
+        <div class="win term">
+          <div class="win-bar"><span class="win-title">Command Prompt</span><button class="copy" type="button">Copy</button><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+<pre><code><span class="p">C:\Setup\RunAdminGate&gt; </span>start /wait runadmingate.exe /install /allowedpath:"C:\Program Files\Fabrikam\Updater\update.exe;\\fs01\updates\setup*.msi /qn" /quiet
+<span class="p">C:\Setup\RunAdminGate&gt; </span>echo %ERRORLEVEL%
+<span class="c">0</span></code></pre>
+        </div>
+        <p>Exit code <strong>0</strong> means installed and running. <strong>1603</strong> means it failed; the reason is in the Application log.</p>
+        <p><strong>Group Policy.</strong> Manage the list centrally with a Group Policy Preferences registry item:</p>
+        <div class="ref-wrap">
+          <table class="ref">
+            <tbody>
+              <tr><td>Location</td><td>Computer Configuration › Preferences › Windows Settings › Registry › New › Registry Item</td></tr>
+              <tr><td>Action</td><td>Update</td></tr>
+              <tr><td>Hive</td><td>HKEY_LOCAL_MACHINE</td></tr>
+              <tr><td>Key path</td><td><code>SOFTWARE\RunAdminGate</code></td></tr>
+              <tr><td>Value name</td><td><code>AllowedPath</code></td></tr>
+              <tr><td>Value type</td><td>REG_EXPAND_SZ</td></tr>
+              <tr><td>Value data</td><td>Your entries separated by <code>;</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The service reads the value on every request, so a policy refresh is enough. The policy replaces the whole value each time it applies, so changes made in the manager on that PC will be overwritten. Keep the list in one place.</p>
+        <p><strong>Shortcuts by policy.</strong> A Group Policy Preferences shortcut works the same as the manager's: target <code>C:\Program Files\RunAdminGate\runadmingate.exe</code>, the quoted program path as the arguments, and the program file as the icon.</p>
+      </section>
+
+      <section class="step" id="uninstall">
+        <div class="step-head"><span class="num" aria-hidden="true">9</span><h2>Uninstall</h2></div>
+        <p>Click <span class="ui">Uninstall</span> in the manager, or run the launcher from your setup folder:</p>
+        <div class="win term">
+          <div class="win-bar"><span class="win-title">Command Prompt</span><button class="copy" type="button">Copy</button><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+<pre><code><span class="p">C:\Setup\RunAdminGate&gt; </span>start /wait runadmingate.exe /uninstall /quiet</code></pre>
+        </div>
+        <p>This removes the service, the <code>HKLM\SOFTWARE\RunAdminGate</code> key with the allow-list, the Open with entries, the shortcuts the manager created, the Event Log source and <code>C:\Program Files\RunAdminGate</code>. If you run it from inside that folder, the last file is deleted at the next restart. Remove any Group Policy item first, or it will create the key again.</p>
+      </section>
+
+      <section class="step" id="troubleshooting">
+        <div class="step-head"><span class="num" aria-hidden="true">?</span><h2>Troubleshooting</h2></div>
+        <div class="ref-wrap">
+          <table class="ref">
+            <thead><tr><th scope="col">What you see</th><th scope="col">Cause and fix</th></tr></thead>
+            <tbody>
+              <tr><td>“This program is not on the RunAdminGate allow-list.”</td><td>No entry matches the path and arguments. Folder entries don't include subfolders. Paste the entry into the rule tester above.</td></tr>
+              <tr><td>Event ID 20, “Ignored AllowedPath entries”</td><td>An entry is relative, has a wildcard in the drive or share name, or uses an unknown <code>%VARIABLE%</code>. Fix or remove it.</td></tr>
+              <tr><td>“The administrator logon mode is not available yet.”</td><td>The entry or <code>LogonFlag</code> uses <code>/asadmin</code>. Remove the switch to run as SYSTEM.</td></tr>
+              <tr><td>“Requests are only accepted from an interactive desktop session.”</td><td>The launcher ran from a service or a scheduled task without a desktop. Start it from the user's session.</td></tr>
+              <tr><td>The app can't see a mapped drive</td><td>The app runs as SYSTEM, which has none of the user's drive mappings. Use a <code>\\server\share</code> path.</td></tr>
+              <tr><td>“App (admin)” isn't in the Open with menu</td><td>Windows shows new handlers under <span class="ui">Choose another app</span> first. Pick it there once.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </article>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <a class="brand" href="index.html"><img src="img/logo-64.png" alt="" width="26" height="26"><span>RunAdminGate</span></a>
+    <nav aria-label="Footer">
+      <a href="index.html">Overview</a>
+      <a href="download.html">Download</a>
+      <a href="https://github.com/UnkAtreus/run-admin-gate">Source code on GitHub</a>
+    </nav>
+    <p class="fine">RunAdminGate is an independent project and is not affiliated with Microsoft. Windows is a trademark of Microsoft Corporation.</p>
+  </div>
+</footer>
+
+<script src="site.js" defer></script>
+</body>
+</html>

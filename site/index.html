@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Run programs as administrator without admin rights | RunAdminGate</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="RunAdminGate is a free Windows service with an allow-list. Standard users start approved programs as administrator. No admin password is stored or shared, and every start is written to the Event Log.">
+<link rel="icon" type="image/png" href="img/logo-64.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Schibsted+Grotesk:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html"><img src="img/logo-64.png" alt="" width="32" height="32"><span>RunAdminGate</span></a>
+    <nav class="nav" aria-label="Main">
+      <a class="nav-sec" href="#how">How it works</a>
+      <a class="nav-sec" href="#security">Security</a>
+      <a href="how-to.html">Setup guide</a>
+      <a class="btn btn-primary btn-sm" href="download.html">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="label"><span class="shield" aria-hidden="true"></span>For Windows system administrators and IT support</p>
+        <h1>Run approved apps <span class="hl">as administrator</span> without giving out admin rights</h1>
+        <p class="lead">RunAdminGate is a small Windows service with an allow-list. You choose the programs, folders and installers. Standard users start them elevated from a shortcut or the Open with menu. Nobody types an admin password, none is stored, and every start is written to the Event Log.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="download.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/></svg>
+            Download for Windows
+          </a>
+          <a class="btn btn-quiet" href="how-to.html">
+            Read the setup guide
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg>
+          </a>
+        </div>
+        <ul class="facts">
+          <li>Free, source on GitHub</li>
+          <li>Windows 10, 11 and Server, 64-bit</li>
+          <li>No .NET or other runtime</li>
+          <li>Version 0.1.0 preview</li>
+        </ul>
+      </div>
+
+      <div class="hero-visual">
+        <figure class="shot">
+          <img src="img/manager.png" width="1622" height="1096" alt="The RunAdminGate manager. Notepad, Registry Editor and Disk Cleanup are on the allow-list, and Notepad's settings are open: allowed arguments, Open with and a desktop shortcut.">
+        </figure>
+        <div class="events" aria-label="Example entries from the Application event log">
+          <article class="event ev-info">
+            <header><span class="lvl" aria-hidden="true">i</span><strong>Information</strong><span>Event ID 1</span><span class="src">RunAdminGate</span></header>
+            <p>Started as SYSTEM for CONTOSO\mlee (session 2): "C:\Program Files\Fabrikam\Updater\update.exe"<br>Process ID 6120</p>
+          </article>
+          <article class="event ev-warn">
+            <header><span class="lvl" aria-hidden="true">!</span><strong>Warning</strong><span>Event ID 2</span><span class="src">RunAdminGate</span></header>
+            <p>Refused for CONTOSO\mlee: C:\Users\mlee\Downloads\setup.exe<br>This program is not on the RunAdminGate allow-list.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="problems">
+    <div class="wrap">
+      <div class="problem-head">
+        <div class="sec-head">
+          <p class="label">The problem</p>
+          <h2>Still fighting user permissions?</h2>
+          <p>Plenty of older programs only work when they run as administrator. On a PC where users are standard users, as they should be, every start of that program needs someone who knows the admin password.</p>
+        </div>
+        <figure class="shot-uac">
+          <div class="uacw" role="img" aria-label="Illustration of a User Account Control prompt: to run Client 01, Windows asks the standard user for the Administrator account's password.">
+            <div class="uacw-head">
+              <div class="uacw-title"><span>User Account Control</span><span class="uacw-x"></span></div>
+              <p class="uacw-q">Do you want to allow this app from an unknown publisher to make changes to your device?</p>
+            </div>
+            <div class="uacw-body">
+              <div class="uacw-app"><span class="uacw-icon"></span><span>Client 01</span></div>
+              <p>Publisher: Unknown<br>File origin: Hard drive on this computer</p>
+              <p class="uacw-link">Show more details</p>
+              <p>To continue, enter an admin user name and password.</p>
+              <div class="uacw-cred">
+                <span class="uacw-user"></span>
+                <div class="uacw-fields">
+                  <span class="uacw-name">Administrator</span>
+                  <span class="uacw-field">Password</span>
+                  <span class="uacw-domain">Domain: Demo-Company</span>
+                </div>
+              </div>
+            </div>
+            <div class="uacw-foot"><span class="uacw-btn off">Yes</span><span class="uacw-btn">No</span></div>
+          </div>
+        </figure>
+      </div>
+
+      <ol class="stall">
+        <li>
+          <span class="n" aria-hidden="true">1</span>
+          <h3>An old program demands admin rights</h3>
+          <p>Accounting software, a lab instrument tool, a device configurator. It was written when every user was an admin, and it still has to “Run as administrator”.</p>
+        </li>
+        <li>
+          <span class="n" aria-hidden="true">2</span>
+          <h3>The user gets stuck</h3>
+          <p>Windows asks for an admin user name and password. The user doesn't have one, so the task waits.</p>
+        </li>
+        <li>
+          <span class="n" aria-hidden="true">3</span>
+          <h3>IT gets the call</h3>
+          <p>Someone walks over, remotes in, or reads the password out over the phone. Tomorrow it happens again.</p>
+        </li>
+        <li class="bad">
+          <span class="n" aria-hidden="true">4</span>
+          <h3>The quick fixes aren't safe</h3>
+          <p>Shared admin passwords end up in notes and scripts. A password saved with <code>runas /savecred</code> works for every program. Making the user a local admin opens up the whole PC.</p>
+        </li>
+      </ol>
+
+      <p class="turn">With RunAdminGate</p>
+
+      <div class="fixit">
+        <div class="fixit-head">
+          <img src="img/logo-64.png" alt="" width="48" height="48">
+          <div>
+            <h3>The program just opens, and the user keeps working</h3>
+            <p>Allow the program once. From then on the user starts it like any other app, and it runs with the rights it needs. Nobody has to type, share or store an admin password.</p>
+          </div>
+        </div>
+        <ul class="benefits">
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg>
+            <strong>No more waiting</strong>
+            <span>The approved program opens from a shortcut or Open with. No password prompt, no ticket, no IT visit.</span>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>
+            <strong>Secure</strong>
+            <span>No admin password is stored on the PC. Users stay standard users, only the programs on your list run elevated, and every start is logged.</span>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h7"/><path d="m15 17 2 2 4-4"/></svg>
+            <strong>Easy to set up</strong>
+            <span>Install the service, add the program, create a shortcut. One command rolls the same setup out to every PC.</span>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 4 7.5v9l8 4 8-4v-9z"/><path d="M4 7.5l8 4 8-4M12 11.5v9"/></svg>
+            <strong>The program stays as it is</strong>
+            <span>No repackaging and no changes to the old program. RunAdminGate only decides who may start it elevated.</span>
+          </li>
+        </ul>
+        <a class="more" href="how-to.html">See the setup step by step →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="label">How it works</p>
+        <h2>One allow-list, checked on every start</h2>
+        <p>The launcher the user runs has no rights of its own. It asks a service, and the service decides.</p>
+      </div>
+      <ol class="flow">
+        <li>
+          <span class="num" aria-hidden="true">1</span>
+          <h3>The user starts the app</h3>
+          <p>From a shortcut such as “Notepad (admin)”, from Open with, or from a script.</p>
+          <code>runadmingate.exe "C:\Tools\tool.exe"</code>
+        </li>
+        <li>
+          <span class="num" aria-hidden="true">2</span>
+          <h3>The launcher asks the service</h3>
+          <p>It sends the program path and arguments over a local named pipe. Requests from the network are rejected.</p>
+          <code>\\.\pipe\<wbr>RunAdminGate</code>
+        </li>
+        <li>
+          <span class="num" aria-hidden="true">3</span>
+          <h3>The service checks the list</h3>
+          <p>Paths are normalized first, so <code>..\</code> can't climb out of an allowed folder. No match means no start.</p>
+          <code>HKLM\<wbr>SOFTWARE\<wbr>RunAdminGate</code>
+        </li>
+        <li>
+          <span class="num" aria-hidden="true">4</span>
+          <h3>The program starts elevated</h3>
+          <p>It runs as SYSTEM on the user's own desktop. The Event Log records who started what, with the process ID.</p>
+          <code>Event ID 1 · 2 · 3</code>
+        </li>
+      </ol>
+
+      <div class="win regedit">
+        <div class="win-bar"><span class="win-title">Registry Editor</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+        <div class="reg-path">Computer\HKEY_LOCAL_MACHINE\SOFTWARE\RunAdminGate</div>
+        <div class="table-scroll">
+          <table class="reg-table">
+            <thead><tr><th scope="col">Name</th><th scope="col">Type</th><th scope="col">Data</th></tr></thead>
+            <tbody>
+              <tr><td><span class="reg-ico sz" aria-hidden="true">ab</span>(Default)</td><td>REG_SZ</td><td>(value not set)</td></tr>
+              <tr><td><span class="reg-ico sz" aria-hidden="true">ab</span>AllowedPath</td><td>REG_EXPAND_SZ</td><td>"C:\Windows\System32\notepad.exe" %1;C:\Tools\;\\fs01\updates\setup*.msi /qn</td></tr>
+              <tr><td><span class="reg-ico sz" aria-hidden="true">ab</span>LogonFlag</td><td>REG_EXPAND_SZ</td><td>asservice</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="caption">The whole configuration is one registry key. Standard users can read it but can't change it, and Group Policy Preferences can push the same value to every PC.</p>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="label">Features</p>
+        <h2>Small enough to read, strict where it counts</h2>
+      </div>
+      <div class="features">
+        <div class="feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><path d="m3.5 6 1.3 1.3L7.3 4.8M3.5 12l1.3 1.3 2.5-2.5M3.5 18l1.3 1.3 2.5-2.5"/></svg>
+          <h3>Apps, folders or patterns</h3>
+          <p>Allow <code>C:\Tools\app.exe</code>, a folder like <code>C:\Tools\</code>, its subfolders with <code>C:\Tools\**</code>, or <code>\\server\share\setup*.exe</code>. Patterns match the whole path, and the drive or share is always written out.</p>
+        </div>
+        <div class="feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h9m4 0h3M4 17h3m4 0h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>
+          <h3>Argument control</h3>
+          <p>Per program: no arguments, one file to open (<code>%1</code>), or exactly the arguments you list, such as <code>/S</code>. Anything else is refused.</p>
+        </div>
+        <div class="feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="m9 15 6-6m-4.5 0H15v4.5"/></svg>
+          <h3>Shortcuts with the app's icon</h3>
+          <p>Put “App (admin)” on the desktop for all users or in the Start menu. It looks like the app, so users know what they are clicking.</p>
+        </div>
+        <div class="feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5z"/><path d="M14 3.5v5h5"/><path d="m10.5 12 4 2.5-4 2.5z"/></svg>
+          <h3>Open with</h3>
+          <p>Right-click a file and open it in the elevated app, for config files and logs that need admin rights to save.</p>
+        </div>
+        <div class="feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="3.5" width="15" height="17" rx="2"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4"/></svg>
+          <h3>Audit in the Event Log</h3>
+          <p>Event ID 1 for a start, 2 for a refusal, 3 for a failure, each with the account and session. Forward them to your SIEM like any other Windows event.</p>
+        </div>
+        <div class="feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="m7 9.5 3 2.5-3 2.5M12.5 15H17"/></svg>
+          <h3>Silent install</h3>
+          <p><code>runadmingate.exe /install /quiet</code> returns 0 on success and 1603 on failure, so any deployment tool that runs a command can roll it out.</p>
+        </div>
+      </div>
+
+      <div class="shots">
+        <figure>
+          <img src="img/add-rule.png" width="1622" height="1096" loading="lazy" alt="The Add a rule dialog rejecting the entry *\updates\setup.exe because it is not an absolute path, with a syntax reference below.">
+          <figcaption>Rules are checked before they are saved. An entry like <code>*\updates\setup.exe</code> could match a file anywhere, so it is rejected.</figcaption>
+        </figure>
+        <figure>
+          <img src="img/open-with.png" width="589" height="688" loading="lazy" alt="The Windows 'How do you want to open this file?' dialog listing Notepad (admin) with Notepad's icon.">
+          <figcaption>The Open with entry carries the app's own icon.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="security">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="label">Security</p>
+        <h2>What the gate enforces, and what stays your call</h2>
+        <p>RunAdminGate controls which programs start elevated. What an elevated program can do after that depends on the program you chose.</p>
+      </div>
+      <div class="split">
+        <div class="panel">
+          <h3>Built in</h3>
+          <ul class="checks">
+            <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.6 2.5L16 9.5"/></svg><div><strong>No stored password</strong><span>The service runs as LocalSystem and starts programs itself. There is no credential on disk to steal.</span></div></li>
+            <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.6 2.5L16 9.5"/></svg><div><strong>Only administrators change the list</strong><span>The allow-list lives under HKLM. Users can't add their own entries.</span></div></li>
+            <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.6 2.5L16 9.5"/></svg><div><strong>Local, signed-in users only</strong><span>The pipe accepts interactive users on the PC. Network clients and anonymous logons are rejected.</span></div></li>
+            <li class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.6 2.5L16 9.5"/></svg><div><strong>Strict matching that fails closed</strong><span>Paths are normalized before matching, patterns must match the whole path, and invalid entries are ignored and logged as Event ID 20.</span></div></li>
+          </ul>
+        </div>
+        <div class="panel caution">
+          <h3>Your call</h3>
+          <ul class="checks">
+            <li class="careful"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4m0 2.6v.1"/></svg><div><strong>Elevated apps can start other apps</strong><span>A program with a File › Open dialog, a built-in console or a script host gives the user everything SYSTEM can do. That includes Notepad, which these screenshots use as a demo. Allow tools, not shells.</span></div></li>
+            <li class="careful"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4m0 2.6v.1"/></svg><div><strong>Don't allow folders users can write to</strong><span>If a user can copy a file into an allowed folder, they can run anything. Keep allowed folders under Program Files or on a read-only share.</span></div></li>
+            <li class="careful"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4m0 2.6v.1"/></svg><div><strong>Programs run as SYSTEM, not as the user</strong><span>They don't see the user's mapped drives or HKEY_CURRENT_USER. Use UNC paths, and test each app before you roll it out.</span></div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="compare">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="label">Compared</p>
+        <h2>The usual workarounds, side by side</h2>
+      </div>
+      <div class="compare-scroll">
+        <table class="compare">
+          <thead>
+            <tr>
+              <th scope="col"><span class="sr-only">Question</span></th>
+              <th scope="col">Make the user a local admin</th>
+              <th scope="col">Saved admin credentials</th>
+              <th scope="col" class="us"><span class="us-head"><span class="shield" aria-hidden="true"></span>RunAdminGate</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">What can the user run elevated?</th><td>Anything</td><td>Anything, with <code>runas /savecred</code></td><td class="us">Only listed programs</td></tr>
+            <tr><th scope="row">Admin password stored on the PC?</th><td>No</td><td>Yes</td><td class="us">No</td></tr>
+            <tr><th scope="row">Control over arguments?</th><td>No</td><td>Depends on the tool</td><td class="us">None, one file, or an exact list</td></tr>
+            <tr><th scope="row">Record of elevated starts?</th><td>No</td><td>Usually not</td><td class="us">Event Log, every start and refusal</td></tr>
+            <tr><th scope="row">Central management</th><td>Group membership</td><td>Per PC</td><td class="us">One registry value, Group Policy</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="label">FAQ</p>
+        <h2>Questions admins ask first</h2>
+      </div>
+      <div class="faq">
+        <details open>
+          <summary>Does it turn off UAC?</summary>
+          <div class="answer"><p>No. UAC stays on for everything else. Programs on the list are started by the service, so they open without a UAC prompt.</p></div>
+        </details>
+        <details>
+          <summary>Which account do the programs run as?</summary>
+          <div class="answer"><p>As the local SYSTEM account, on the desktop of the user who asked. A second mode that runs the program as the user with temporary administrator rights (<code>/asadmin</code>) is planned and not available yet.</p></div>
+        </details>
+        <details>
+          <summary>Which Windows versions are supported?</summary>
+          <div class="answer"><p>Windows 10, Windows 11 and Windows Server 2019 or later, all 64-bit. Version 0.1.0 was tested on Windows Server 2019 (build 17763, the same build as Windows 10 version 1809). Windows 10 and 11 desktops haven't been tested yet.</p></div>
+        </details>
+        <details>
+          <summary>Can I manage it with Group Policy?</summary>
+          <div class="answer"><p>Yes. The allow-list is the <code>AllowedPath</code> registry value, so a Group Policy Preferences registry item can set it on every PC. The service reads it on each request, so changes apply without a restart. An ADMX template is planned.</p></div>
+        </details>
+        <details>
+          <summary>What file types can it start?</summary>
+          <div class="answer"><p><code>.exe</code>, <code>.com</code>, <code>.bat</code>, <code>.cmd</code>, <code>.ps1</code>, <code>.vbs</code> and <code>.msi</code> files.</p></div>
+        </details>
+        <details>
+          <summary>Is it free?</summary>
+          <div class="answer"><p>Yes. The source code is on GitHub and you can build it yourself. The license hasn't been chosen yet.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="disclaimer">
+    <div class="wrap disclaimer">
+      <p class="label">Disclaimer</p>
+      <h2>Read this before you deploy</h2>
+      <div class="disc-cols">
+        <p><strong>Provided as is.</strong> RunAdminGate is provided “as is”, without warranty of any kind, express or implied, including warranties of merchantability, fitness for a particular purpose and non-infringement.</p>
+        <p><strong>Preview software.</strong> Version 0.1.0 is an early preview. It may contain bugs, and its behavior may change between versions. Test it on machines that don't matter before you use it anywhere else.</p>
+        <p><strong>You choose what runs elevated.</strong> Programs started through RunAdminGate run with full SYSTEM rights. You are responsible for the programs and rules you allow. The authors are not liable for any damage, data loss, security incident or downtime that results from using it.</p>
+        <p><strong>Your policies and licenses.</strong> Check that using it fits your organization's security policy and compliance rules, and the license terms of the programs you allow.</p>
+        <p><strong>Trademarks.</strong> RunAdminGate is an independent project. It is not affiliated with, endorsed by or sponsored by Microsoft. Windows and Windows Server are trademarks of the Microsoft group of companies. Contoso and Fabrikam are fictional example names.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band-cta">
+    <div class="wrap">
+      <img src="img/logo.png" alt="" width="84" height="84">
+      <div>
+        <h2>Try it on a test PC first</h2>
+        <p>This is an early preview. Set it up on a lab machine, allow one app, and sign in as a standard user to see it work.</p>
+      </div>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="download.html">Download</a>
+        <a class="btn btn-quiet" href="how-to.html">Setup guide</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <a class="brand" href="index.html"><img src="img/logo-64.png" alt="" width="26" height="26"><span>RunAdminGate</span></a>
+    <nav aria-label="Footer">
+      <a href="how-to.html">Setup guide</a>
+      <a href="download.html">Download</a>
+      <a href="https://github.com/UnkAtreus/run-admin-gate">Source code on GitHub</a>
+    </nav>
+    <p class="fine">RunAdminGate is an independent project and is not affiliated with Microsoft. Windows is a trademark of Microsoft Corporation.</p>
+  </div>
+</footer>
+
+<script src="site.js" defer></script>
+</body>
+</html>
