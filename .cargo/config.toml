@@ -1,0 +1,4 @@
+[alias]
+# Cross-build the Windows binaries from macOS/Linux (needs mingw-w64).
+win = "build --release --target x86_64-pc-windows-gnu -p runadmingate -p runadmingate-manager"
+win32 = "build --release --target i686-pc-windows-gnu -p runadmingate -p runadmingate-manager"

@@ -1,0 +1,29 @@
+[package]
+name = "runadmingate-manager"
+description = "RunAdminGate Manager: choose which programs standard users may run as administrator"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+build = "build.rs"
+
+[dependencies]
+runadmingate-core = { path = "../runadmingate-core" }
+runadmingate-win = { path = "../runadmingate-win" }
+
+[target.'cfg(windows)'.dependencies]
+iced = { version = "0.14", default-features = false, features = ["tiny-skia", "image-without-codecs", "thread-pool", "crisp"] }
+rfd = "0.17"
+windows-service = "0.8"
+
+[target.'cfg(windows)'.dependencies.windows]
+version = "0.58"
+features = [
+    "Win32_Foundation",
+    "Win32_System_Com",
+    "Win32_System_Environment",
+    "Win32_UI_Shell",
+]
+
+[build-dependencies]
+embed-resource = "3"

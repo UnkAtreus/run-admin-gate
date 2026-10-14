@@ -1,0 +1,5 @@
+target/
+docs/
+scripts/
+assets/
+.DS_Store

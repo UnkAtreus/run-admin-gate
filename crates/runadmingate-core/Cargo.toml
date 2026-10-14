@@ -1,0 +1,9 @@
+[package]
+name = "runadmingate-core"
+description = "Allow-list model, policy matcher and IPC protocol shared by the RunAdminGate tools"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]

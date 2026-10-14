@@ -1,0 +1,28 @@
+#include <windows.h>
+
+1 ICON "app.ico"
+1 24 "manager.manifest"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     0,2,0,0
+PRODUCTVERSION  0,2,0,0
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_APP
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "RunAdminGate Manager"
+            VALUE "FileVersion", "0.2.0"
+            VALUE "InternalName", "runadmingate-manager"
+            VALUE "OriginalFilename", "runadmingate-manager.exe"
+            VALUE "ProductName", "RunAdminGate"
+            VALUE "ProductVersion", "0.2.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
