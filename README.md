@@ -77,4 +77,4 @@ checks each request against the allow-list and starts the program itself.
 
 ## License
 
-Not chosen yet. `Cargo.toml` says MIT as a placeholder, and there is no LICENSE file.
+Copyright 2026 the RunAdminGate authors. Licensed under the [Apache License, Version 2.0](LICENSE).
